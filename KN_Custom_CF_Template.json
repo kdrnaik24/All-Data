@@ -1,0 +1,107 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Resources": {
+		"GoogleVPCCloud": {
+			"Type": "AWS::EC2::VPC",
+			"Properties": {
+				"CidrBlock": "10.0.0.0/16",
+				"InstanceTenancy": "default",
+				"Tags": [{
+					"Key": "Name",
+					"Value": "CFVPC"
+				}]
+			}
+		},
+
+		"GooglePublicSubnet": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "GoogleVPCCloud"
+				},
+				"CidrBlock": "10.0.0.0/24",
+				"AvailabilityZone": "us-east-1a",
+				"Tags": [{
+					"Key": "Name",
+					"Value": "GooglePubSubnet"
+				}]
+			}
+		},
+		
+		"GoogleEC2Instance":{
+			"Type": "AWS::EC2::"
+		
+		}
+
+		"GooglePrivateSubnet": {
+			"Type": "AWS::EC2::Subnet",
+			"Properties": {
+				"VpcId": {
+					"Ref": "GoogleVPCCloud"
+				},
+				"CidrBlock": "10.0.1.0/24",
+				"AvailabilityZone": "us-east-1a",
+				"Tags": [{
+					"Key": "Name",
+					"Value": "GooglePriSubnet"
+				}]
+			}
+		},
+		
+		"GoogleInternetGateway" : {
+         "Type" : "AWS::EC2::InternetGateway",
+         "Properties" : {
+            "Tags" : [ {"Key" : "name", "Value" : "Google_IG"}]
+         }
+		},
+		
+		"AttachInternetGatewayToVPC" :{
+			"Type": "AWS::EC2::VPCGatewayAttachment",
+			"Properties": {
+				"VpcId": { "Ref" : "GoogleVPCCloud"},
+				"InternetGatewayId" : { "Ref" : "GoogleInternetGateway"}
+			}	
+		},
+		
+		"GoogleVPCNetworkAcl" : {
+			"Type" : "AWS::EC2::NetworkAcl",
+			"Properties" : {
+				"VpcId" : { "Ref" : "GoogleVPCCloud" },
+				"Tags" : [ { "Key" : "name", "Value" : "GoogleVPCNetworkACL" } ]
+			}
+		},	
+		
+		"GooglePublicRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {"Ref" : "GoogleVPCCloud"}
+			}
+		},
+		
+		"GooglePublicRoute" : {
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"RouteTableId" : { "Ref" : "GooglePublicRouteTable" },
+				"DestinationCidrBlock" : "0.0.0.0/0",
+				"GatewayId" : { "Ref" : "GoogleInternetGateway" }
+			}
+		},
+		
+		"GooglePrivateRouteTable" : {
+			"Type" : "AWS::EC2::RouteTable",
+			"Properties" : {
+				"VpcId" : {"Ref" : "GoogleVPCCloud"}
+			}
+		},
+		
+		"GooglePrivateRoute" : {
+			"Type" : "AWS::EC2::Route",
+			"Properties" : {
+				"RouteTableId" : { "Ref" : "GooglePrivateRouteTable" },
+				"DestinationCidrBlock" : "10.0.0.0/16"
+			}
+		}
+		
+		
+	}
+}
