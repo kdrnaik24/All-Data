@@ -1,0 +1,149 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+
+  "Description" : "AWS CloudFormation Sample Template to create instance and output ID for transforming to an image by Roark.",
+
+  "Parameters" : {
+    "HeirloomId" : {
+      "Description" : "Id of Heirloom",
+      "Type" : "String"
+    },
+    "HeirloomName" : {
+      "Description" : "Heirloom Name",
+      "Type" : "String"
+    },
+    "HeirloomBucketPrefix" : {
+      "Description" : "Heirloom Bucket Prefix",
+      "Type" : "String"
+    }
+  },
+
+  "Mappings" : {
+    "AWSRegionArch2AMI" : {
+      "us-east-1"      : { "PV64" : "ami-1624987f" },
+      "us-west-2"      : { "PV64" : "ami-2a31bf1a" },
+      "us-west-1"      : { "PV64" : "ami-1bf9de5e" },
+      "eu-west-1"      : { "PV64" : "ami-c37474b7" },
+      "ap-southeast-1" : { "PV64" : "ami-a6a7e7f4" },
+      "ap-southeast-2" : { "PV64" : "ami-bd990e87" },
+      "ap-northeast-1" : { "PV64" : "ami-4e6cd34f" },
+      "sa-east-1"      : { "PV64" : "ami-1e08d103" }
+    }
+  },
+
+  "Resources" : {
+    "RootRole": {
+       "Type": "AWS::IAM::Role",
+       "Properties": {
+          "AssumeRolePolicyDocument": {
+             "Statement": [ {
+                "Effect": "Allow",
+                "Principal": {
+                   "Service": [ "ec2.amazonaws.com" ]
+                },
+                "Action": [ "sts:AssumeRole" ]
+             } ]
+          },
+          "Path": "/"
+       }
+    },
+
+    "RolePolicies": {
+       "Type": "AWS::IAM::Policy",
+       "Properties": {
+          "PolicyName": "root",
+          "PolicyDocument": {
+            "Statement":[
+              {
+                "Effect": "Allow",
+                "Action": "*",
+                "Resource": "*"
+              }
+            ]
+          },
+          "Roles": [ { "Ref": "RootRole" } ]
+       }
+    },
+
+    "RootInstanceProfile": {
+       "Type": "AWS::IAM::InstanceProfile",
+       "Properties": {
+          "Path": "/",
+          "Roles": [ { "Ref": "RootRole" } ]
+       }
+    },
+
+    "Instance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "IamInstanceProfile": { "Ref": "RootInstanceProfile" },
+        "ImageId" : { "Fn::FindInMap" : [ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" }, "PV64" ]},
+        "InstanceType" : "m1.large",
+        "SecurityGroups" : [{ "Ref" : "Ec2SecurityGroup" }],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash\n",
+
+          "export HISTSIZE=0", "\n",
+
+          "yum install -y ruby19 ruby19-devel gcc libxml2-devel libxslt-devel", "\n",
+
+          "gem1.9 install json --no-ri --no-rdoc", "\n",
+          "gem1.9 install heirloom -v 0.11.2 --no-ri --no-rdoc", "\n",
+
+          "mkdir -m 0700 /tmp/build", "\n",
+
+          "/usr/local/bin/heirloom download -n ", { "Ref": "HeirloomName" },
+                                            " -i ", { "Ref": "HeirloomId" },
+                                            " -b ", { "Ref": "HeirloomBucketPrefix" },
+                                            " -r ", { "Ref": "AWS::Region" },
+                                            " -o /tmp/build ",
+                                            " --use-iam-profile -x", "\n",
+
+          "/tmp/build/configure.sh", "\n",
+
+          "/tmp/build/cfn-signal.sh $? '", { "Ref": "InstancesWaitHandle" }, "'", "\n",
+
+          "gem1.9 uninstall -x heirloom json", "\n",
+
+          "yum erase -y ruby19 ruby19-devel gcc libxml2-devel libxslt-devel", "\n",
+
+          "/bin/rm -rf /tmp/build", "\n"
+        ]]}}
+      }
+    },
+
+    "Ec2SecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "HTTP and SSH access",
+        "SecurityGroupIngress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : "22", "ToPort" : "22",
+          "CidrIp" : "0.0.0.0/0"
+        } ]
+      }
+    },
+
+    "InstancesWaitHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle",
+      "Properties": {}
+    },
+
+    "InstancesWaitCondition": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "DependsOn": [ "Instance" ],
+      "Properties": {
+        "Handle": { "Ref": "InstancesWaitHandle" },
+        "Count": "1",
+        "Timeout": "1500"
+      }
+    }
+  },
+
+  "Outputs" : {
+    "InstanceId" : {
+      "Value" : { "Ref" : "Instance" },
+      "Description" : "ID of Instance"
+    }
+  }
+}
