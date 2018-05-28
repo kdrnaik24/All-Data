@@ -1,0 +1,9 @@
+https://www.spinnaker.io/concepts/
+
+https://docs.armory.io/user-guides/application-screen/
+
+https://docs.armory.io/overview/naming-conventions/
+
+https://medium.com/@DockerTurtle/lets-understand-spinnaker-object-model-1181416b53e6
+
+https://www.youtube.com/results?search_query=spinnaker+deployments&sp=CAI%253D
