@@ -1,0 +1,10 @@
+1) CNI
+https://thenewstack.io/hackers-guide-kubernetes-networking/
+
+https://docs.projectcalico.org/v1.5/reference/advanced/calico-cni
+
+http://www.nuagenetworks.net/blog/container-networking-standards/
+
+https://coreos.com/rkt/
+
+2)
