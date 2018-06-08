@@ -1,0 +1,5 @@
+1) AWS Encryption - KMS keys
+https://www.youtube.com/watch?v=BsrDxz1Y_zs&t=923s
+
+2) Case study - evolution from SSH -> Capistrano -> VM -> Chef -> Docker -> Kubernetes -> Helm charts
+https://www.youtube.com/watch?v=NrFTEd8RVOE
