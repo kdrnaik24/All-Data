@@ -7,4 +7,7 @@ http://www.nuagenetworks.net/blog/container-networking-standards/
 
 https://coreos.com/rkt/
 
-2)
+2) Container networking videos and links
+*****  https://www.youtube.com/watch?v=QMNbgmxmB-M
+
+https://www.youtube.com/watch?v=m138loKiYo0
