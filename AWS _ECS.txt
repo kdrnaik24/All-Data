@@ -3,3 +3,7 @@ https://www.youtube.com/watch?v=qbEPae8YNbs
 
 2)How AWS ECS Works a Gentle Introduction     //Good for Hands On
 https://www.youtube.com/watch?v=P2gGjvM8liU
+
+https://blog.boltops.com/2017/09/08/aws-ecs-terms-tutorial        // blog about AWS ECS
+
+https://blog.boltops.com/2017/09/09/a-gentle-introduction-to-aws-ecs-with-example-tutorial     //Actual blog to refer while doing handson
