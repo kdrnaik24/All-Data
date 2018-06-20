@@ -1,0 +1,5 @@
+1) Deep Dive on Amazon Amazon Elastic Container Service (Amazon ECS)
+https://www.youtube.com/watch?v=qbEPae8YNbs
+
+2)How AWS ECS Works a Gentle Introduction     //Good for Hands On
+https://www.youtube.com/watch?v=P2gGjvM8liU
